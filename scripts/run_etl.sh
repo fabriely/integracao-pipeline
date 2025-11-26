@@ -56,3 +56,14 @@ else
     log_error "Erro na extração"
     exit 1
 fi
+
+# ========================================
+# ETAPA 2: TRANSFORM
+# ========================================
+log_step "Etapa 2/3: Transformação de Dados"
+if python src/transform/main.py; then
+    log_success "Transformação concluída"
+else
+    log_error "Erro na transformação"
+    exit 1
+fi
