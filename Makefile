@@ -36,4 +36,8 @@ extract: ## Executa apenas a etapa de extração
 	@echo "$(GREEN)Executando extração...$(NC)"
 	$(PYTHON) src/extract/main.py
 
+transform: ## Executa apenas a etapa de transformação
+	@echo "$(GREEN)Executando transformação...$(NC)"
+	$(PYTHON) src/transform/main.py
+
 .DEFAULT_GOAL := help
