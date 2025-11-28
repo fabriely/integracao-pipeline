@@ -26,6 +26,10 @@ install: ## Instala todas as dependências
 	$(PIP) install -r requirements.txt
 	@echo "$(GREEN)✓ Dependências instaladas com sucesso!$(NC)"
 
+etl: ## Executa o pipeline ETL completo
+	@echo "$(GREEN)Executando pipeline ETL...$(NC)"
+	./scripts/run_etl.sh
+
 setup: install ## Configura o ambiente completo
 	@echo "$(GREEN)Configurando ambiente...$(NC)"
 	chmod +x scripts/*.sh
@@ -39,5 +43,9 @@ extract: ## Executa apenas a etapa de extração
 transform: ## Executa apenas a etapa de transformação
 	@echo "$(GREEN)Executando transformação...$(NC)"
 	$(PYTHON) src/transform/main.py
+
+load: ## Executa apenas a etapa de carga
+	@echo "$(GREEN)Executando carga...$(NC)"
+	$(PYTHON) src/load/main.py
 
 .DEFAULT_GOAL := help

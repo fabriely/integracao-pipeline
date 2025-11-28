@@ -67,3 +67,33 @@ else
     log_error "Erro na transformação"
     exit 1
 fi
+
+# ========================================
+# ETAPA 3: LOAD
+# ========================================
+log_step "Etapa 3/3: Carga de Dados"
+if python src/load/main.py; then
+    log_success "Carga concluída"
+else
+    log_error "Erro na carga"
+    exit 1
+fi
+
+# ========================================
+# FINALIZAÇÃO
+# ========================================
+TIMESTAMP_END=$(date +"%Y-%m-%d %H:%M:%S")
+echo ""
+echo -e "${GREEN}========================================${NC}"
+echo -e "${GREEN}✓ Pipeline ETL Concluído!${NC}"
+echo -e "${GREEN}========================================${NC}"
+echo -e "${BLUE}Início:  ${TIMESTAMP}${NC}"
+echo -e "${BLUE}Término: ${TIMESTAMP_END}${NC}"
+echo ""
+
+# Estatísticas (opcional)
+echo -e "${YELLOW}Estatísticas:${NC}"
+echo "- Logs disponíveis em: logs/"
+echo "- Dados finais em: data/final/"
+echo ""
+
