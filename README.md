@@ -1,4 +1,4 @@
-# Pipeline ETL - Situação Final dos Alunos do Recife
+# Pipeline ETL/ELT - Situação Final dos Alunos do Recife
 
 ## Início Rápido
 
@@ -6,8 +6,6 @@
 
 - **Python 3.8+**
 - **PostgreSQL 12+** 
-- **Git**
-- **Jupyter Notebook** (opcional, mas recomendado)
 
 ### Instalação
 
@@ -17,18 +15,9 @@ git clone https://github.com/fabriely/integracao-pipeline.git
 cd integracao-pipeline
 ```
 
-2. **Configure o ambiente:**
-```bash
-make setup
-```
+2. ****
 
-3. **Configure o banco de dados:**
-```bash
-cp .env.example .env
-# Edite o arquivo .env com suas credenciais PostgreSQL
-```
-
-### Execução Rápida
+### Execução Rápida (ELT)
 
 **Opção 1: Jupyter Notebook (Recomendado)**
 ```bash
@@ -36,95 +25,74 @@ jupyter notebook src/notebooks/ETL.ipynb
 # Execute todas as células sequencialmente
 ```
 
-**Opção 2: Comandos Make**
+### Execução ELT
+
+Você precisa configurar sua conexão com o servidor PostgreSQL usando o arquivo `profiles.yml`.
+
+1. Localize o arquivo `profiles.yml`:
+   - **Linux/macOS:** `~/.dbt/profiles.yml`
+   - **Windows:** `%USERPROFILE%\.dbt\profiles.yml`
+
+2. Adicione essas configurações do profiles.yml caso não queira usar seu próprio banco:
+
+```yaml
+profile: transformacao_matricula
+
+transformacao_matricula:
+  target: transformacao_matricula_db
+  outputs:
+    transformacao_matricula_db:
+      type: postgres
+      host: aws-1-us-east-1.pooler.supabase.com
+      user: postgres.jkgdzhpqywydnucbdfvp
+      password: postgres
+      port: 6543
+      schema: staging  
+      dbname: transformacao_matricula
+      threads: 1
+```
+
+3. teste a sua conexão:
+
 ```bash
-make etl          # Pipeline completo
-make extract      # Apenas extração
-make help         # Ver todos os comandos
+dbt debug
 ```
 
-## Estrutura do Projeto
+4. Se não criou o projeto dbt ainda, rode:
 
+```bash
+dbt init nome_do_projeto
 ```
-integracao-pipeline/
-├── data/                     # Dados do pipeline
-│   ├── raw/                    # Dados brutos extraídos das APIs
-│   ├── processed/              # Dados limpos e transformados
-│   └── final/                  # Dados finais e backups
-├── database/                # Scripts SQL e schemas
-│   ├── staging.sql            # Schema do banco staging
-│   └── dw.sql                 # Schema do data warehouse
-├── src/
-│   ├── notebooks/          # Jupyter Notebooks
-│   │   └── ETL.ipynb          # Pipeline ETL interativo completo
-│   ├── extract/            # Módulos de extração
-│   ├── transform/          # Módulos de transformação  
-│   ├── load/               # Módulos de carregamento
-│   └── utils/              # Utilitários e configurações
-├── logs/                    # Logs de execução
-├── scripts/                # Scripts de automação
-├── .env.example               # Template de variáveis de ambiente
-├── Makefile                   # Comandos de automação
-└── requirements.txt           # Dependências Python
-```
+### Executar o script ELT
+
+1. Execute o script `ELT.ipynb`.
+2. Você pode checar as tabelas do schema staging para verificar os dados enviados ao banco.
+
+### ELT Pipeline
+3. Rode o comando para os testes do schema.yml:
+   ```bash
+   dbt test
+   ```
+4. Rode o comando para gerar a estrutura final do esquema estrela:
+   ```bash
+   dbt run
+   ```
+Isso criará a estrutura base do dbt, cheque as tabelas novas.
+
 
 ## Estrutura do Data Warehouse
 
 O pipeline cria automaticamente um **esquema dimensional (estrela)** no PostgreSQL:
 
 ### Dimensões
-- **`dw.dim_tempo`** - Dimensão temporal (datas de processamento)
-- **`dw.dim_ano`** - Dimensão dos anos letivos (2022-2024)
-- **`dw.dim_caracteristicas`** - Características categóricas dos dados
+- **`dw.dim_tempo`** - Dimensão temporal
+- **`dw.dim_aluno`** - Dimensão de Alunos com suas Informações
+- **`dw.dim_escola`** - Dimensão de Escola com suuas informações
+- **`dw.dim_localizacao`** - Dimensão de Localização com Informações geográficas
+- **`dw.dim_turma`** - Dimensão de turma contendo as informações por turma
 
 ### Tabela Fato
-- **`dw.fato_situacao_alunos`** - Fatos da situação final dos alunos
-
-## Configuração
-
-### Variáveis de Ambiente (.env)
-
-```bash
-# Configurações do PostgreSQL
-DB_HOST=localhost
-DB_PORT=5432  
-DB_NAME=escolas_dw
-DB_USER=postgres
-DB_PASSWORD=sua_senha_aqui
-
-# Configurações opcionais
-DB_SCHEMA=dw
-DB_POOL_SIZE=5
-```
-
-### PostgreSQL Setup
-
-1. **Instale o PostgreSQL** (se não instalado):
-```bash
-# macOS
-brew install postgresql
-
-# Ubuntu/Debian  
-sudo apt install postgresql postgresql-contrib
-
-# Windows
-# Baixe do site oficial: https://www.postgresql.org/download/
-```
-
-2. **Inicie o serviço:**
-```bash
-# macOS
-brew services start postgresql
-
-# Linux
-sudo systemctl start postgresql
-```
-
-3. **Crie usuário e banco** (opcional - o pipeline cria automaticamente):
-```sql
-CREATE USER etl_user WITH PASSWORD 'senha_segura';
-CREATE DATABASE escolas_dw OWNER etl_user;
-```
+- **`dw.fato_matricula`** - Fatos da matricula dos alunos
 
 ## Dados Processados
 
@@ -157,10 +125,3 @@ O pipeline extrai e processa dados do **Portal de Dados Abertos do Recife**:
    - Carregamento otimizado com índices
    - Validação da integridade referencial
    - Backup automático em caso de falha
-
-### Logs e Monitoramento
-
-Os logs são salvos automaticamente em:
-- `logs/etl_YYYYMMDD.log` - Logs diários do pipeline  
-- `data/final/ultima_carga.txt` - Timestamp da última execução
-- Console output com status detalhado
