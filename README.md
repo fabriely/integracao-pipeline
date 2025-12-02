@@ -122,4 +122,4 @@ O pipeline extrai e processa dados do **Portal de Dados Abertos do Recife**:
 
 
 ## Link do nosso relatório:
-[text](https://docs.google.com/document/d/1Ix-1Dhyp2PHDByeZ8WxYUYjPaBFUbFPzb6t7LDEsHr8/edit?tab=t.0)
+[Relatório](https://docs.google.com/document/d/1Ix-1Dhyp2PHDByeZ8WxYUYjPaBFUbFPzb6t7LDEsHr8/edit?tab=t.0)
