@@ -1,0 +1,164 @@
+version: 2
+
+sources:
+  - name: transformacao_matricula
+    schema: staging
+    tables:
+      - name: staging_alunos_raw
+        description: "Dados brutos da área de staging"
+        columns:
+          - name: matricula
+            description: "Número de matrícula do aluno"
+            tests:
+              - not_null
+          - name: ano
+            description: "Ano letivo"
+            tests:
+              - not_null
+
+models:
+  # STAGING
+  - name: staging_situacao_alunos
+    description: "Tabela de staging com dados limpos e padronizados"
+    columns:
+      - name: matricula
+        description: "Número de matrícula do aluno"
+        tests:
+          - not_null
+      - name: ano
+        description: "Ano letivo"
+        tests:
+          - not_null
+
+  # INTERMEDIATE
+  - name: transform_data
+    description: "Dados transformados com tipagem correta"
+    columns:
+      - name: matricula
+        tests:
+          - not_null
+          - unique
+      - name: ano
+        tests:
+          - not_null
+
+  # DIMENSÕES
+  - name: dim_aluno
+    description: "Dimensão de alunos"
+    columns:
+      - name: id_aluno
+        description: "Chave primária da dimensão aluno"
+        tests:
+          - not_null
+          - unique
+      - name: matricula
+        description: "Número de matrícula"
+        tests:
+          - not_null
+
+  - name: dim_escola
+    description: "Dimensão de escolas"
+    columns:
+      - name: id_escola
+        description: "Chave primária da dimensão escola"
+        tests:
+          - not_null
+          - unique
+      - name: codigo_escola
+        description: "Código da escola"
+        tests:
+          - not_null
+
+  - name: dim_turma
+    description: "Dimensão de turmas"
+    columns:
+      - name: id_turma
+        description: "Chave primária da dimensão turma"
+        tests:
+          - not_null
+          - unique
+
+  - name: dim_situacao
+    description: "Dimensão de situação final"
+    columns:
+      - name: id_situacao
+        description: "Chave primária da dimensão situação"
+        tests:
+          - not_null
+          - unique
+      - name: situacao_nome
+        tests:
+          - not_null
+
+  - name: dim_localizacao
+    description: "Dimensão de localização"
+    columns:
+      - name: id_locali
+        description: "Chave primária da dimensão localização"
+        tests:
+          - not_null
+          - unique
+
+  - name: dim_tempo
+    description: "Dimensão de tempo"
+    columns:
+      - name: id_tempo
+        description: "Chave primária da dimensão tempo"
+        tests:
+          - not_null
+          - unique
+      - name: ano
+        tests:
+          - not_null
+
+  # FATO
+  - name: fato_matricula
+    description: "Tabela fato de matrículas"
+    columns:
+      - name: matricula
+        description: "Chave primária - número de matrícula"
+        tests:
+          - not_null
+          - unique
+      - name: id_aluno
+        description: "Chave estrangeira para dim_aluno"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_aluno')
+              field: id_aluno
+      - name: id_escola
+        description: "Chave estrangeira para dim_escola"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_escola')
+              field: id_escola
+      - name: id_turma
+        description: "Chave estrangeira para dim_turma"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_turma')
+              field: id_turma
+      - name: id_situacao
+        description: "Chave estrangeira para dim_situacao"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_situacao')
+              field: id_situacao
+      - name: id_locali
+        description: "Chave estrangeira para dim_localizacao"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_localizacao')
+              field: id_locali
+      - name: id_tempo
+        description: "Chave estrangeira para dim_tempo"
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_tempo')
+              field: id_tempo

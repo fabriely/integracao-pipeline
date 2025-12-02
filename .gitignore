@@ -1,0 +1,7 @@
+# virtual enviroment
+venv
+
+# Compiled dbt files
+target/
+logs/
+
