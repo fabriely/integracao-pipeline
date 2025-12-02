@@ -1,0 +1,29 @@
+name: transformacao_matricula
+version: '1.0'
+config-version: 2
+
+profile: transformacao_matricula
+
+model-paths: ["transformacao_aprovados/models"]
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+models:
+  transformacao_matricula:
+    staging:
+      +materialized: table
+      +schema: staging
+    intermediate:
+      +materialized: table
+      +schema: intermediate
+    dimensions:
+      +materialized: table
+      +schema: dimensions
+    facts:
+      +materialized: table
+      +schema: facts
+    marts:
+      +materialized: view
+      +schema: marts
